@@ -1,9 +1,9 @@
-import { Button } from "@/components/ui/button"
+import { CurrencyConverter } from "./components/CurrencyConverter"
 
 function App() {
   return (
      <div className="flex min-h-svh flex-col items-center justify-center">
-      Deu o Carai
+      <CurrencyConverter/>
     </div>
 
   )
