@@ -1,11 +1,18 @@
 import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { ArrowLeftRight, DollarSign, TrendingUp } from "lucide-react";
 import { currencyApiService } from "@/api/currency"; // Ajuste o caminho conforme necessário
+import { Input } from "./ui/input";
+import { Select, SelectContent, SelectItem } from "./ui/select";
+import { SelectTrigger } from "@radix-ui/react-select";
+import { Label } from "./ui/label";
 
-interface CurrencyConverterProps {
-  // Props opcionais se necessário, mas para este exemplo, o componente é autônomo
-}
 
 export const CurrencyConverter = () => {
   const [value, setValue] = useState<number>(1);
@@ -26,7 +33,10 @@ export const CurrencyConverter = () => {
 
     try {
       await currencyApiService.convertCurrency({ value, from, to });
-      const response = await currencyApiService.getLastRates({ base_currency: from, currencies: [to] });
+      const response = await currencyApiService.getLastRates({
+        base_currency: from,
+        currencies: [to],
+      });
       const fetchedRate = response.data[to]?.value;
       const fetchedLastUpdated = response.meta.last_updated_at;
 
@@ -46,22 +56,29 @@ export const CurrencyConverter = () => {
     }
   };
 
-  const formatValue = (val: number) => val.toFixed(2);
+  const formatValue = (val: number) => val.toFixed(1);
   const formatDate = (dateStr: string) => new Date(dateStr).toLocaleString();
 
   return (
-    <Card className="overflow-hidden mt-10">
+    <div className="flex flex-col items-center justify-center">
+
+        <Card className="overflow-hidden mt-10">
+      <CardHeader className="space-y-2">
+        <CardTitle className="text-2xl font-bold tracking-tighter">
+          Conversor de Moedas
+        </CardTitle>
+        <CardDescription className="text-sm text-muted-foreground">
+          Converta valores entre moedas
+        </CardDescription>
+      </CardHeader>
       <CardContent className="p-6">
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-4">
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold tracking-tighter">Conversor de Moedas</h2>
-              <p className="text-sm text-muted-foreground">Converta valores entre moedas</p>
-            </div>
             <div className="flex flex-col gap-4">
+              <Label className="text-lg text-muted-foreground"><DollarSign className="h-5 w-5 text-green-500" /> Valor:</Label>
+                
               <div className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4 text-green-500" />
-                <input
+                <Input
                   type="number"
                   value={value}
                   onChange={(e) => setValue(Number(e.target.value))}
@@ -70,25 +87,45 @@ export const CurrencyConverter = () => {
                 />
               </div>
               <div className="flex gap-2">
-                <select
+
+                <Select
                   value={from}
-                  onChange={(e) => setFrom(e.target.value)}
-                  className="border p-2 rounded flex-1"
+                  onValueChange={setFrom}
                 >
-                  <option value="USD">USD</option>
-                  <option value="EUR">EUR</option>
-                  <option value="BRL">BRL</option>
-                </select>
-                <ArrowLeftRight className="h-6 w-6 text-muted-foreground" />
-                <select
+                  <SelectTrigger className="w-[120px] border p-2 rounded flex-1">
+                    {from}
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="USD">USD</SelectItem>
+                    <SelectItem value="EUR">EUR</SelectItem>
+                    <SelectItem value="BRL">BRL</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                   <ArrowLeftRight
+                  className="h-6 w-6 text-muted-foreground mt-2 cursor-pointer"
+                  onClick={() => {
+                    setFrom(to);
+                    setTo(from);
+                    setConvertedValue(null);
+                    setRate(null);
+                    setLastUpdated(null);
+                  }}
+                />
+
+                <Select
                   value={to}
-                  onChange={(e) => setTo(e.target.value)}
-                  className="border p-2 rounded flex-1"
+                  onValueChange={setTo}
                 >
-                  <option value="USD">USD</option>
-                  <option value="EUR">EUR</option>
-                  <option value="BRL">BRL</option>
-                </select>
+                  <SelectTrigger className="w-[120px] border p-2 rounded flex-1">
+                    {to}
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="USD">USD</SelectItem>
+                    <SelectItem value="EUR">EUR</SelectItem>
+                    <SelectItem value="BRL">BRL</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <button
                 onClick={handleConvert}
@@ -122,5 +159,7 @@ export const CurrencyConverter = () => {
         </div>
       </CardContent>
     </Card>
+    </div>
+
   );
 };
