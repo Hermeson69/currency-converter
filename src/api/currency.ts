@@ -36,19 +36,36 @@ export class CurrencyApiService {
     return this.fetchData<CurrenciesResponse>(url);
   }
 
-    async getLastRates({
-      base_currency = "USD", 
+  async getLastRates({
+    base_currency = "USD",
+    currencies,
+  }: {
+    base_currency?: string;
+    currencies: string[];
+  }): Promise<ExchangeRatesResponse> {
+    const url = this.createUrl(API_CONFIG.LATEST, {
+      base_currency,
       currencies,
-    }: {
-      base_currency?: string;
-      currencies: string[];
-    }): Promise<ExchangeRatesResponse> {
-      const url = this.createUrl(API_CONFIG.LATEST, {
-        base_currency,
-        currencies,
-      });
-      return this.fetchData<ExchangeRatesResponse>(url);
-    }
+    });
+    return this.fetchData<ExchangeRatesResponse>(url);
+  }
+
+/*   async getHistoricalRates({
+    date,
+    base_currency = "USD",
+    currencies,
+  }: {
+    date: string; // formato: YYYY-MM-DD
+    base_currency?: string;
+    currencies: string[];
+  }): Promise<ExchangeRatesResponse> {
+    const url = this.createUrl(API_CONFIG.HISTORICAL, {
+      date,
+      base_currency,
+      currencies,
+    });
+    return this.fetchData<ExchangeRatesResponse>(url);
+  } */
 
   async convertCurrency({
     value,
@@ -73,13 +90,11 @@ export class CurrencyApiService {
       return this.fallbackConversion(value, from, to);
     }
 
-    // Validar moedas
     const currencies = await this.getCurrencies();
     if (!currencies.data[from] || !currencies.data[to]) {
       throw new Error("Invalid source or target currency");
     }
 
-    // Fazer conversão
     const response = await this.getLastRates({ base_currency: from, currencies: [to] });
     const rate = response.data[to]?.value;
     if (!rate) throw new Error("Conversion rate not available");

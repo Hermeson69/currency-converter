@@ -3,6 +3,7 @@ export const API_CONFIG = {
   STATUS: "https://api.currencyapi.com/v3/status",
   CURRENCIES: "https://api.currencyapi.com/v3/currencies",
   LATEST: "https://api.currencyapi.com/v3/latest",
+  HISTORICAL: "https://api.currencyapi.com/v3/historical",
   DEFAULT_PARAMS: {
     apikey: import.meta.env.VITE_CURRENCY_API_KEY,
   },
