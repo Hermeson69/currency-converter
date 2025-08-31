@@ -11,7 +11,6 @@ Este é um conversor de moedas desenvolvido como parte de um desafio técnico. A
 - **Gráfico de Tendências**: Exibe um gráfico de linhas com taxas atuais replicadas ao longo de 7 dias.
 - **Tratamento de Erros**: Exibe alertas para erros de API, moedas inválidas ou valores negativos.
 - **Troca de Moedas**: Botão para inverter as moedas de origem e destino.
-- **Testes Automatizados**: Testes unitários com Vitest e React Testing Library.
 
 ## Moedas Suportadas
 
