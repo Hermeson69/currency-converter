@@ -46,7 +46,6 @@ As moedas são fixas para simplificar, mas podem ser expandidas com dados da API
 - **Integração com API**: Optou-se por usar uma API pública para taxas em tempo real, em vez de valores fixos, para adicionar realismo (diferencial).
 - **Tratamento de Erros**: Incluiu alertas amigáveis para erros de API e validações (diferencial).
 - **Interface**: Interface web com React para interatividade (diferencial).
-- **Testes**: Adicionados testes unitários com Vitest (diferencial).
 - **Gráfico**: Simplificado para exibir taxas atuais como tendência; poderia ser expandido para dados históricos reais.
 - **Versionamento**: Commits claros e atômicos (ex.: "feat: adicionar componente conversor").
 
