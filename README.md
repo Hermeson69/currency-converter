@@ -52,7 +52,7 @@ As moedas são fixas para simplificar, mas podem ser expandidas com dados da API
 ## Instalação e Execução
 
 ### Pré-requisitos
-- Node.js (v18 ou superior).
+- Node.js (v22 ou superior).
 - npm ou yarn como gerenciador de pacotes.
 
 ### Passos
