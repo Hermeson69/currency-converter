@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem } from "./ui/select";
 import { SelectTrigger } from "@radix-ui/react-select";
 import { Label } from "./ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { CurrencyHistoryChart } from "@/components/CurrecyGraph"; // Importe o componente
 
 export const CurrencyConverter = () => {
   const [value, setValue] = useState<number>(1);
@@ -162,6 +163,9 @@ export const CurrencyConverter = () => {
                 <p className="text-muted-foreground">Aguardando conversão...</p>
               )}
             </div>
+          </div>
+          <div className="mt-6">
+            <CurrencyHistoryChart days={7} />
           </div>
         </CardContent>
       </Card>
