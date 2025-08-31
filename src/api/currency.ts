@@ -50,22 +50,6 @@ export class CurrencyApiService {
     return this.fetchData<ExchangeRatesResponse>(url);
   }
 
-  /*   async getHistoricalRates({
-      date,
-      base_currency = "USD",
-      currencies,
-    }: {
-      date: string; // formato: YYYY-MM-DD
-      base_currency?: string;
-      currencies: string[];
-    }): Promise<ExchangeRatesResponse> {
-      const url = this.createUrl(API_CONFIG.HISTORICAL, {
-        date,
-        base_currency,
-        currencies,
-      });
-      return this.fetchData<ExchangeRatesResponse>(url);
-    } */
 
   async convertCurrency({
     value,

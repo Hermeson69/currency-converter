@@ -13,8 +13,6 @@ import { Select, SelectContent, SelectItem } from "./ui/select";
 import { SelectTrigger } from "@radix-ui/react-select";
 import { Label } from "./ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CurrencyHistoryChart } from "@/components/CurrecyGraph"; // Importe o componente
-
 export const CurrencyConverter = () => {
   const [value, setValue] = useState<number>(1);
   const [from, setFrom] = useState<string>("USD");
@@ -41,17 +39,16 @@ export const CurrencyConverter = () => {
       const fetchedRate = response.data[to]?.value;
       const fetchedLastUpdated = response.meta.last_updated_at;
 
-      const converted = value * fetchedRate;
+      if (!fetchedRate || !fetchedLastUpdated) {
+        throw new Error("Dados inválidos retornados pela API");
+      }
 
+      const converted = value * fetchedRate;
       setConvertedValue(converted);
       setRate(fetchedRate);
       setLastUpdated(fetchedLastUpdated);
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Ocorreu um erro desconhecido.");
-      }
+      setError(err instanceof Error ? err.message : "Ocorreu um erro desconhecido.");
     } finally {
       setLoading(false);
     }
@@ -98,7 +95,7 @@ export const CurrencyConverter = () => {
                   <Input
                     type="number"
                     value={value}
-                    onChange={(e) => setValue(Number(e.target.value))}
+                    onChange={(e) => setValue(Number(e.target.value) || 0)}
                     className="border p-2 rounded w-full"
                     placeholder="Valor"
                   />
@@ -137,8 +134,8 @@ export const CurrencyConverter = () => {
                 </div>
                 <button
                   onClick={handleConvert}
-                  disabled={loading}
-                  className="bg-blue-500 text-white p-2 rounded"
+                  disabled={loading || value <= 0}
+                  className="bg-blue-500 text-white p-2 rounded disabled:bg-gray-400"
                 >
                   {loading ? "Convertendo..." : "Converter"}
                 </button>
@@ -163,9 +160,6 @@ export const CurrencyConverter = () => {
                 <p className="text-muted-foreground">Aguardando conversão...</p>
               )}
             </div>
-          </div>
-          <div className="mt-6">
-            <CurrencyHistoryChart days={7} />
           </div>
         </CardContent>
       </Card>

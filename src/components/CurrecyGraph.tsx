@@ -9,6 +9,7 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format, subDays } from "date-fns";
+import { currencyApiService } from "@/api/currency";
 
 interface ChartDataItem {
   date: string;
@@ -17,53 +18,64 @@ interface ChartDataItem {
 
 interface CurrencyHistoryChartProps {
   days?: number;
-  baseCurrency?: string;
 }
 
 export function CurrencyHistoryChart({
   days = 7,
-  baseCurrency = "USD",
 }: CurrencyHistoryChartProps) {
   const [chartData, setChartData] = useState<ChartDataItem[]>([]);
-  const currencies = ["BRL","USD", "EUR"]; // Include USD regardless of baseCurrency
-  const colors = ["#a256eb", "#f97316", "#ec4899"];
-
-  // Fixed rates from CurrencyApiService.fallbackConversion
-  const FIXED_RATES: Record<string, Record<string, number>> = {
-    USD: { BRL: 5, EUR: 0.9, USD: 1 }, 
-    EUR: { BRL: 6, USD: 1 / 0.9 },
-    BRL: { USD: 1 / 5, EUR: 1 / 6 },
-  };
+  const [error, setError] = useState<string | null>(null);
+  const currencies = ["BRL", "EUR"]; // Moedas para rastrear, base é USD
+  const colors = ["#a256eb", "#f97316"];
 
   useEffect(() => {
-    const generateFixedRateData = () => {
-      const data: ChartDataItem[] = [];
-      const today = new Date();
-
-      for (let i = days - 1; i >= 0; i--) {
-        const date = format(subDays(today, i), "dd/MM");
-        const rates: ChartDataItem = { date };
-
-        currencies.forEach((currency) => {
-          const value = FIXED_RATES[baseCurrency]?.[currency] ?? 0;
-          rates[currency] = Number(value.toFixed(4));
+    const fetchRealTimeRates = async () => {
+      try {
+        const response = await currencyApiService.getLastRates({
+          base_currency: "USD",
+          currencies,
         });
 
-        data.push(rates);
-      }
+        const ratesData: Record<string, number> = {};
+        currencies.forEach((currency) => {
+          ratesData[currency] = response.data[currency]?.value ?? 0;
+        });
 
-      setChartData(data);
+        // Gera dados replicando as taxas atuais para todos os dias (linha horizontal)
+        const data: ChartDataItem[] = [];
+        const today = new Date();
+
+        for (let i = days - 1; i >= 0; i--) {
+          const date = format(subDays(today, i), "dd/MM");
+          const rates: ChartDataItem = { date };
+
+          currencies.forEach((currency) => {
+            rates[currency] = Number(ratesData[currency].toFixed(4));
+          });
+
+          // Inclui a base USD como 1
+          rates["USD"] = 1;
+
+          data.push(rates);
+        }
+
+        setChartData(data);
+        setError(null);
+      } catch (err) {
+        setError("Falha ao carregar taxas em tempo real.");
+      }
     };
 
-    generateFixedRateData();
-  }, [days, baseCurrency]);
+    fetchRealTimeRates();
+  }, [days]);
 
   return (
     <Card className="flex-1 mt-10">
       <CardHeader>
-        <CardTitle>Historical Exchange Rates (Base: {baseCurrency})</CardTitle>
+        <CardTitle>Real-Time Exchange Rates (Base: USD)</CardTitle>
       </CardHeader>
       <CardContent>
+        {error && <p className="text-red-500">{error}</p>}
         <div className="h-[200px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
@@ -107,7 +119,7 @@ export function CurrencyHistoryChart({
                   return null;
                 }}
               />
-              {currencies.map((currency, index) => (
+              {["USD", ...currencies].map((currency, index) => (
                 <Line
                   key={currency}
                   type="monotone"
